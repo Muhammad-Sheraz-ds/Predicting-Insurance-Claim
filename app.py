@@ -2,12 +2,10 @@ import streamlit as st
 import pandas as pd
 import pickle
 
-# Load the trained model
 model_file = "insurance.pkl"
 with open(model_file, "rb") as file:
     model = pickle.load(file)
 
-# Define the input ranges and options
 age_range = (0, 100)
 bmi_range = (10, 60)
 bp_range = (60, 150)
@@ -17,7 +15,6 @@ gender_options = ['Male', 'Female']
 diabetic_options = ['No', 'Yes']
 smoker_options = ['No', 'Yes']
 region_options = ['Southeast', 'Northwest', 'Southwest', 'Northeast']
-
 
 def get_user_inputs():
     st.sidebar.header("User Input")
@@ -32,12 +29,10 @@ def get_user_inputs():
 
     return age, gender, bmi, blood_pressure, diabetic, children, smoker, region
 
-# Function to make a prediction
 def predict_claim(age, gender, bmi, blood_pressure, diabetic, children, smoker, region):
     regions = ['Southeast', 'Northwest', 'Southwest', 'Northeast']
     region_num = regions.index(region)
 
-    # Create a DataFrame for prediction
     input_data = pd.DataFrame({
         'age': [age],
         'gender': [gender.lower()],
@@ -49,37 +44,29 @@ def predict_claim(age, gender, bmi, blood_pressure, diabetic, children, smoker, 
         'region': [region.lower()],
     })
 
-    # Ensure the columns match the ones used during training
     input_data = input_data[['age', 'gender', 'bmi', 'bloodpressure', 'diabetic', 'children', 'smoker', 'region']]
 
-    # Make prediction
     prediction = model.predict(input_data)
 
     return prediction[0]
 
-# Main function to run the app
 def main():
     st.title("Insurance Claim Prediction App")
     st.sidebar.markdown(
         """
-        This app predicts the estimated insurance claim amount based on user inputs.
+        ### User Input
         Adjust the sliders and options on the left, then click the "Predict" button.
         """
     )
 
-    # Get user inputs
     age, gender, bmi, blood_pressure, diabetic, children, smoker, region = get_user_inputs()
 
-    # Add a "Predict" button
     if st.sidebar.button("Predict", key='predict_button'):
-        # Make prediction
         prediction = predict_claim(age, gender, bmi, blood_pressure, diabetic, children, smoker, region)
 
-        # Display the prediction in a clear and bold format
         st.subheader("Estimated Insurance Claim Amount:")
-        st.write(f"Rs. {prediction[0]:,.2f}", key='prediction_result', font=("Arial", 24, 'bold'))
+        st.write(f"**$ {prediction:,.2f}**", key='prediction_result', font=("Arial", 24, 'bold'), use_container_width=True)
 
-    # Additional information and tips
     st.markdown(
         """
         ### Tips:
@@ -89,6 +76,5 @@ def main():
         """
     )
 
-# Run the app
 if __name__ == "__main__":
     main()
